@@ -4,24 +4,24 @@
 
 """ A high level class interface to RATP
 """
-from collections import Iterable
+import json
 import numpy
 import pandas
-import json
 
+from collections import Iterable
+
+import alinea.astk.scene.pgl_scene as pgls
+from alinea.astk.scene.display import display_property
+from alinea.astk.scene.surfacic_point_cloud import SurfacicPointCloud
+from alinea.astk.scene.tagged_mesh import unit_square_mesh
 from alinea.pyratp.grid import Grid
+from alinea.pyratp.interface.clumping_index import get_clumping
+from alinea.pyratp.interface.post_processing import aggregate_light, aggregate_grid
+from alinea.pyratp.interface.smart_grid import SmartGrid
 from alinea.pyratp.micrometeo import MicroMeteo
 from alinea.pyratp.runratp import runRATP
 from alinea.pyratp.skyvault import Skyvault, elevations46, azimuths46, omegas_46
 from alinea.pyratp.vegetation import Vegetation
-
-from alinea.pyratp.interface.clumping_index import get_clumping
-from alinea.pyratp.interface.geometry import unit_square_mesh
-from alinea.pyratp.interface.smart_grid import SmartGrid
-from alinea.pyratp.interface.surfacic_point_cloud import SurfacicPointCloud
-from alinea.pyratp.interface.post_processing import aggregate_light, aggregate_grid
-from alinea.pyratp.interface.display import display_property
-import alinea.pyratp.interface.pgl_scene as pgls
 
 
 def sample_database():
@@ -29,13 +29,6 @@ def sample_database():
     """
     return {'Montpellier': {'city': 'Montpellier', 'latitude':43.61,
                             'longitude':3.87}}
-
-
-def is_pgl_scene(scene):
-    if not pgls.pgl_imported:
-        return False
-    else:
-        return isinstance(scene, pgls.pgl.Scene)
 
 
 class RatpScene(object):
@@ -83,14 +76,14 @@ class RatpScene(object):
         scene_box = ((0, 0, 0), (1, 1, 1))
 
         if scene is None:
-            scene = {'plant': unit_square_mesh()}
+            scene = unit_square_mesh()
 
         if isinstance(scene, SurfacicPointCloud):
             self.scene = scene
             self.scene_mesh = scene.as_scene_mesh()
             if grid is None:
                 scene_box = scene.bbox()
-        elif is_pgl_scene(scene):
+        elif pgls.is_pgl_scene(scene):
             self.scene_mesh = pgls.as_scene_mesh(scene)
             self.scene = SurfacicPointCloud.from_scene_mesh(self.scene_mesh,
                                                             scene_unit=scene_unit)

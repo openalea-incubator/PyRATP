@@ -1,6 +1,6 @@
 import numpy
 from alinea.pyratp.interface.ratp_scene import RatpScene, pgls
-from alinea.pyratp.interface.surfacic_point_cloud import SurfacicPointCloud
+from alinea.astk.scene.surfacic_point_cloud import SurfacicPointCloud
 
 
 def test_instanciation():
